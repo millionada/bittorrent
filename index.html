@@ -176,13 +176,8 @@ function onLoadDone()
 	async function player_prize()
 	{
 		var prize = await contract.playerPrize(client_address); 
-		
 		console.log('prize ', prize + ' ' + client_address);
-		//if(prize > 0)
-		//{
-			document.getElementById('win_balance').innerHTML="Prize " + prize/1e18;
-		//}
-	
+		document.getElementById('win_balance').innerHTML="Prize " + prize/1e18;
 	}
 	async function ticket_balace()
 	{
@@ -190,68 +185,63 @@ function onLoadDone()
 		document.getElementById('ticket_balance').innerHTML="Tickets " + unscratched;
 	
 	}
+	
 	async function web3_metamask_address() 
 	{
 		const provider = new ethers.providers.Web3Provider(window.ethereum);                    
 		const address = await provider.getSigner().getAddress();
 		console.log(address);                    
 		client_address = address;
-		document.getElementById('metamask_address').innerHTML="Address " + address.substring(0,11) + ' ';// + '<img style="display:inline;" src="net_icon.png" width="30px">';
-		console.log('length ', address.length);
-		if(address.length == 42) clearInterval(web3_metamask_address_timer);
 		
+		if(address.length == 42) 
+		{
+			clearInterval(web3_metamask_address_timer);
+			
+			document.getElementById('metamask_address').innerHTML="Address " + address.substring(0,11) + ' ';// + '<img style="display:inline;" src="net_icon.png" width="30px">';
+			console.log('length ', address.length);
+			console.log("Connected!!"); 
+			
+			contract = new ethers.Contract(lottery_contract, abi, provider.getSigner());
+			console.log(contract );
+		}
+			
 	}
 	
 
-async function web3_metamask_login() {
-		// Check first if the user has the MetaMask installed
-		if ( web3_check_metamask() ) {
+async function web3_metamask_login() 
+{
+	if ( web3_check_metamask() ) 
+	{
 		console.log('Initate Login Process');
 		const provider = new ethers.providers.Web3Provider(window.ethereum);                    
-		try {
-		// Get the Ethereum provider
-		
-		// Get Ethereum accounts
-		await provider.send("eth_requestAccounts", []);
+		try 
+		{
+			await provider.send("eth_requestAccounts", []);
 		}
 		catch (error) 
 		{
 			if (error.message ==="Already processing eth_requestAccounts. Please wait.") 
 			{
 				window.location.reload();
-		  }
-		}
-		
-		console.log("Connected!!"); 
-		// Get the User Ethereum address
-		const address = await provider.getSigner().getAddress();
-		console.log(address);                    
-		client_address = address;
-		document.getElementById('metamask_address').innerHTML="Address " + address.substring(0,11) + ' ';// + '<img style="display:inline;" src="net_icon.png" width="30px">';
-		
-
-	contract = new ethers.Contract(lottery_contract, abi, provider.getSigner());
-	console.log(contract );
-	const result = await contract.unscratched_balance(client_address); 
-	document.getElementById('ticket_balance').innerHTML="Tickets " + result;
-
-	const accounts = await provider.listAccounts();
-	console.log(accounts[0]);
-					
-                }
-            }   
+			}
+		}				
+	}
+}   
 			
 function web3_check_metamask() 
 {
-	if (!window.ethereum) {
-	console.error('It seems that the MetaMask extension is not detected. Please install MetaMask first.');
-	alert('It seems that the MetaMask extension is not detected. Please install MetaMask first.');
-	return false;
-	}else{
-	console.log('MetaMask extension has been detected!!');
-	return true;
+	if (!window.ethereum) 
+	{
+		console.error('It seems that the MetaMask extension is not detected. Please install MetaMask first.');
+		alert('It seems that the MetaMask extension is not detected. Please install MetaMask first.');
+		return false;
 	}
-	}  	
+	else
+	{
+		console.log('MetaMask extension has been detected!!');
+		return true;
+	}
+}  	
 			
 var win_total = 0;
 
