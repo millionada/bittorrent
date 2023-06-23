@@ -156,6 +156,7 @@ const ticket_price = 100000;
 
 var client_address = "";
 var web3_metamask_address_timer;
+var switch_network_timer;
 var contract;
 function onLoadDone()
 {
@@ -170,8 +171,41 @@ function onLoadDone()
 	web3_metamask_address_timer = setInterval(function(){web3_metamask_address();},1000);
 	setInterval(function(){ticket_balace();},5000);
 	setInterval(function(){player_prize();},6000);
+	switch_network_timer = setInterval(function(){switch_network();},5000);
+	
 	
 }	
+	async function switch_network()
+	{
+		console.log('network id ', window.ethereum.networkVersion);
+		
+		if(window.ethereum.networkVersion != 199)
+		{
+			console.log('wrong network', window.ethereum.networkVersion);
+			
+			try {
+				const result = await window.ethereum.request({
+				  method: "wallet_addEthereumChain",
+				  params: [{
+					chainId: "0xC7", //199
+					rpcUrls: ["https://rpc.bt.io/"],
+					chainName: "Bittorrent",
+					nativeCurrency: {
+					  name: "BTTC",
+					  symbol: "BTTC",
+					  decimals: 18
+					},
+					blockExplorerUrls: ["https://scan.bt.io/"]
+				  }]
+				});
+				
+				window.location.reload();
+				
+			  } catch (error){
+				console.log(error)
+			  }
+		}
+	}
 	
 	async function player_prize()
 	{
